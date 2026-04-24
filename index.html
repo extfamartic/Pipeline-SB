@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Brands Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#0F0F13;color:#F0EEF8;font-size:13px;line-height:1.5}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:#16161D;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:8px}
+.lic{width:26px;height:26px;background:#4F46E5;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.lt{font-size:13px;font-weight:500;letter-spacing:-.02em}.ls{font-size:9px;color:#6B6A7A;font-family:monospace}
+.chip{font-size:10px;color:#6B6A7A;background:#1E1E28;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:4px;font-family:monospace}
+.dot{width:5px;height:5px;border-radius:50%;background:#10B981;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.rfbtn{display:flex;align-items:center;gap:5px;background:#1E1E28;border:1px solid rgba(255,255,255,.1);color:#F0EEF8;padding:6px 12px;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.rfbtn:hover{opacity:.8}
+.rfbtn svg{width:12px;height:12px}
+.nav{background:#16161D;border-bottom:1px solid rgba(255,255,255,.07);padding:0 18px;display:flex}
+.nt{background:transparent;border:none;border-bottom:2px solid transparent;color:#6B6A7A;padding:10px 14px;font-size:12px;cursor:pointer;font-family:inherit}
+.nt.on{color:#F0EEF8;border-bottom-color:#4F46E5}
+.main{padding:16px 18px 40px;max-width:1400px;margin:0 auto}
+.kg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.kpi{background:#16161D;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 15px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,#4F46E5)}
+.kl{font-size:9px;color:#6B6A7A;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-family:monospace}
+.kv{font-size:24px;font-weight:300;letter-spacing:-.04em;line-height:1}.ks{font-size:10px;color:#6B6A7A;margin-top:3px}
+.g2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px;margin-bottom:8px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.g2b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.sp2{grid-column:span 2}
+.card{background:#16161D;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:15px 17px}
+.ct{font-size:9px;color:#6B6A7A;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;margin-bottom:11px}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.mc{background:#1E1E28;border-radius:7px;padding:10px;text-align:center}
+.ml{font-size:9px;color:#6B6A7A;margin-bottom:4px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em}
+.mv{font-size:20px;font-weight:300}
+.pw{height:22px;border-radius:5px;background:rgba(255,255,255,.05);overflow:hidden;display:flex;margin-bottom:8px}
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-top:1px solid rgba(255,255,255,.07);padding-top:11px;margin-top:8px;text-align:center}
+.stitle{font-size:9px;color:#6B6A7A;text-transform:uppercase;letter-spacing:.07em;font-family:monospace;margin:14px 0 10px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:8px}
+.badge-info{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(79,70,229,.15);color:#A5B4FC;border:1px solid rgba(79,70,229,.3);font-family:monospace;font-weight:400;text-transform:none;letter-spacing:0}
+.tbr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.tbf{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+select,input[type=text]{background:#1E1E28;border:1px solid rgba(255,255,255,.07);color:#F0EEF8;padding:6px 9px;border-radius:7px;font-size:11px;font-family:inherit;outline:none;cursor:pointer}
+select:focus,input:focus{border-color:rgba(79,70,229,.6)}
+input::placeholder{color:#6B6A7A}
+.wave-chips{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.wchip{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:#1E1E28;color:#6B6A7A;cursor:pointer;font-family:monospace;transition:all .15s;user-select:none}
+.wchip.on{background:#7C3AED;border-color:#7C3AED;color:#fff}
+.wchip.all.on{background:#4F46E5;border-color:#4F46E5}
+.tw{overflow-x:auto;border:1px solid rgba(255,255,255,.07);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead tr{background:#1E1E28}
+th{padding:9px 10px;text-align:left;font-size:9px;color:#6B6A7A;font-family:monospace;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:#c0bfcf}
+th.sa::after{content:" ↑";color:#7C3AED}
+th.sd::after{content:" ↓";color:#7C3AED}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(79,70,229,.06)!important}
+.tb{font-weight:500;color:#F0EEF8}.tn{font-family:monospace;font-size:10px;color:#F0EEF8;text-align:right}
+.tm{color:#9998A8;font-size:11px}.pnd{color:rgba(255,255,255,.2);font-size:9px;font-family:monospace}
+.pg{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px;color:#6B6A7A}
+.pgb{background:#1E1E28;border:1px solid rgba(255,255,255,.07);color:#F0EEF8;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit}
+.pgb:disabled{opacity:.3;cursor:default}
+.hidden{display:none!important}
+.leg{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:#6B6A7A}
+.lsq{width:7px;height:7px;border-radius:1px;flex-shrink:0}
+.pcnt{font-size:11px;color:#6B6A7A;font-family:monospace;white-space:nowrap}
+/* Loading & error states */
+.loading-overlay{position:fixed;inset:0;background:#0F0F13;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.loading-spinner{width:32px;height:32px;border:2px solid rgba(79,70,229,.2);border-top-color:#4F46E5;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:12px;color:#6B6A7A;font-family:monospace}
+.error-banner{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;padding:10px 14px;border-radius:8px;font-size:11px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sheet-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,.1);color:#34D399;border:1px solid rgba(16,185,129,.2);font-family:monospace}
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Cargando datos desde Google Sheets…</div>
+</div>
+
+<div id="app" class="hidden">
+
+<div class="hdr">
+  <div class="logo">
+    <div class="lic"><svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5"><path d="M2 11L6 7.5L9 10.5L14 5"/><circle cx="14" cy="5" r="1.5" fill="white" stroke="none"/></svg></div>
+    <div><div class="lt">Social Brands</div><div class="ls">Pipeline Dashboard</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="sheet-badge" id="last-updated">conectado a Sheets</span>
+    <div class="chip"><span class="dot"></span><span id="live-time">cargando…</span></div>
+    <button class="rfbtn" id="refresh-btn" onclick="loadFromSheets()">
+      <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6.5A5.5 5.5 0 0 0 10.5 11M1 6.5A5.5 5.5 0 0 1 10.5 2M1 6.5H3.5M10.5 2V4.5M10.5 2H8"/></svg>
+      Refresh
+    </button>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nt on" onclick="go('r',this)">Resumen</button>
+  <button class="nt" onclick="go('p',this)">Plan 2026</button>
+  <button class="nt" onclick="go('m',this)">Marcas</button>
+</div>
+
+<div class="main">
+
+<!-- Error banner (hidden by default) -->
+<div class="error-banner hidden" id="error-banner">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="6"/><path d="M7 4v3M7 10h.01"/></svg>
+  <span id="error-msg">No se pudieron cargar los datos desde Google Sheets.</span>
+</div>
+
+<!-- RESUMEN -->
+<div id="t-r">
+  <div class="kg">
+    <div class="kpi" style="--c:#4F46E5"><div class="kl">Total marcas</div><div class="kv" id="k-total">—</div><div class="ks">en pipeline</div></div>
+    <div class="kpi" style="--c:#10B981"><div class="kl">Onboarded</div><div class="kv" id="k-onboarded">—</div><div class="ks">activas</div></div>
+    <div class="kpi" style="--c:#F59E0B"><div class="kl">Onboarding</div><div class="kv" id="k-onboarding">—</div><div class="ks">en proceso</div></div>
+    <div class="kpi" style="--c:#7C3AED"><div class="kl">Plan 2026</div><div class="kv" id="k-plan">—</div><div class="ks">confirmadas</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Funnel del pipeline</div>
+      <div id="funnel-bars"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Categoría de producto</div>
+      <div style="display:flex;align-items:center;gap:14px;justify-content:center">
+        <svg id="cat-donut" width="78" height="78" viewBox="0 0 78 78"></svg>
+        <div id="cat-legend"></div>
+      </div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card sp2">
+      <div class="ct">Marcas activas por wave</div>
+      <div style="overflow-x:auto"><svg id="wave-bars" width="435" height="110" viewBox="0 0 435 110" style="display:block"></svg></div>
+    </div>
+    <div class="card">
+      <div class="ct">Género objetivo</div>
+      <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+        <svg id="gen-donut" width="78" height="78" viewBox="0 0 78 78"></svg>
+        <div id="gen-legend"></div>
+      </div>
+    </div>
+  </div>
+  <div class="g2b">
+    <div class="card"><div class="ct">Hunters</div><div class="mg" id="hunters-grid"></div></div>
+    <div class="card"><div class="ct">Plan vs Extra — 2026</div><div class="mg" id="planextra-grid"></div></div>
+  </div>
+</div>
+
+<!-- PLAN 2026 -->
+<div id="t-p" class="hidden">
+  <div class="kg">
+    <div class="kpi" style="--c:#10B981"><div class="kl">Onboardings completados</div><div class="kv" id="p-done">—</div><div class="ks">Wave 11+ · meta: 80</div></div>
+    <div class="kpi" style="--c:#F59E0B"><div class="kl">En proceso</div><div class="kv" id="p-proc">—</div><div class="ks">Wave 11-15</div></div>
+    <div class="kpi" style="--c:#EF4444"><div class="kl">Bajas en plan</div><div class="kv" id="p-bajas">—</div><div class="ks">baja OB</div></div>
+    <div class="kpi" style="--c:#6366F1"><div class="kl">Pendientes sin wave</div><div class="kv" id="p-pend">—</div><div class="ks">hunting / negociación</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="ct">Progreso hacia la meta · objetivo 80 marcas onboarded en 2026</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+      <span style="font-size:20px;font-weight:300;letter-spacing:-.04em"><span id="p-active">—</span> <span style="font-size:11px;color:#6B6A7A">en pipeline activo (Wave 11+)</span></span>
+      <span style="font-size:16px;font-weight:300;color:#F59E0B;font-family:monospace" id="p-pct">—%</span>
+    </div>
+    <div class="pw" id="p-bar"></div>
+    <div class="leg" id="p-leg"></div>
+    <div class="m3" id="p-months"></div>
+  </div>
+  <div class="g2" style="margin-bottom:10px">
+    <div class="card">
+      <div class="ct">Avance por wave (Wave 11 en adelante)</div>
+      <div id="wave-progress"></div>
+      <div class="leg" style="margin-top:8px">
+        <span class="li"><span class="lsq" style="background:#10B981"></span>Onboarded</span>
+        <span class="li"><span class="lsq" style="background:#F59E0B"></span>Onboarding</span>
+        <span class="li"><span class="lsq" style="background:#EF4444"></span>Baja OB</span>
+        <span class="li"><span class="lsq" style="background:#444"></span>No inició</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Onboardings 2026 vs meta de 80</div>
+      <div class="leg" style="margin-bottom:10px">
+        <span class="li"><span class="lsq" style="background:#4F46E5"></span>Por mes</span>
+        <span class="li"><span style="display:inline-block;width:14px;height:0;border-top:2px dashed rgba(239,68,68,.55)"></span>&nbsp;Meta lineal</span>
+      </div>
+      <div style="overflow-x:auto"><svg id="monthly-chart" width="432" height="88" viewBox="0 0 432 88" style="display:block"></svg></div>
+    </div>
+  </div>
+
+  <div class="stitle">
+    Marcas en onboarding / onboarded desde Wave 10
+    <span class="badge-info" id="plan-badge">— marcas</span>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#6B6A7A;font-family:monospace;min-width:36px">Wave</span>
+        <div class="wave-chips" id="wave-chips-plan">
+          <span class="wchip all on" onclick="toggleWave('all',this)">Todas</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#6B6A7A;font-family:monospace;min-width:36px">Filtro</span>
+        <select id="pf-status" onchange="pRender()">
+          <option value="">Onboarding + Onboarded</option>
+          <option value="Onboarding">Solo Onboarding</option>
+          <option value="Onboarded">Solo Onboarded</option>
+        </select>
+        <select id="pf-plan" onchange="pRender()">
+          <option value="">Plan + Extra</option>
+          <option value="Plan">Solo Plan</option>
+          <option value="Extra">Solo Extra</option>
+        </select>
+        <input id="pf-q" type="text" placeholder="Buscar marca…" oninput="pRender()" style="width:150px">
+      </div>
+    </div>
+    <span class="pcnt" id="plan-cnt"></span>
+  </div>
+
+  <div class="tw"><table>
+    <thead>
+      <tr>
+        <th onclick="pSort('n')" id="ph-n">Marca</th>
+        <th onclick="pSort('s')" id="ph-s">Status</th>
+        <th onclick="pSort('p')" id="ph-p">Plan 26</th>
+        <th onclick="pSort('wi')" id="ph-w">Wave</th>
+        <th onclick="pSort('f')" id="ph-f">Followers</th>
+        <th onclick="pSort('h')" id="ph-h">Hunter</th>
+        <th>Cust ID</th>
+        <th>TSI</th>
+        <th>ASP</th>
+        <th>TGMV Total MeLi</th>
+        <th onclick="pSort('tpv')" id="ph-tpv">TPV Prom USD</th>
+        <th onclick="pSort('mp')" id="ph-mp">Status MP</th>
+      </tr>
+    </thead>
+    <tbody id="plan-tbody"></tbody>
+  </table></div>
+  <div class="pg">
+    <span id="plan-pgi"></span>
+    <div style="display:flex;gap:5px">
+      <button class="pgb" id="plan-prev" onclick="pCP(-1)">← Ant</button>
+      <button class="pgb" id="plan-next" onclick="pCP(1)">Sig →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARCAS -->
+<div id="t-m" class="hidden">
+  <div class="tbr">
+    <div class="tbf">
+      <select id="fs" onchange="fB()"><option value="">Todos los status</option><option>Hunting</option><option>Presentacion VP</option><option>En negociación</option><option>Onboarding</option><option>Onboarded</option><option>Farming</option><option>Baja Onboarding</option><option>Cancelada</option><option>Despriorizada</option></select>
+      <select id="fp" onchange="fB()"><option value="">Plan / Extra</option><option>Plan</option><option>Extra</option></select>
+      <select id="fh" onchange="fB()"><option value="">Hunters</option><option>Delfi</option><option>Guille</option></select>
+      <input id="fq" type="text" placeholder="Buscar marca…" oninput="fB()" style="width:150px">
+    </div>
+    <span id="bcnt" style="font-size:11px;color:#6B6A7A;font-family:monospace"></span>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Marca</th><th>Status</th><th>Plan 26</th><th>Followers</th><th>Rango</th><th>Categoría</th><th>Hunter</th><th>Wave</th></tr></thead>
+    <tbody id="btbody"></tbody>
+  </table></div>
+  <div class="pg"><span id="bpgi"></span><div style="display:flex;gap:5px"><button class="pgb" id="bprev" onclick="bcp(-1)">← Ant</button><button class="pgb" id="bnxt" onclick="bcp(1)">Sig →</button></div></div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════════════
+//  CONFIGURACIÓN — EDITÁ SOLO ESTA SECCIÓN
+// ══════════════════════════════════════════════════════
+const SHEET_ID   = '1_nkDHrav1oSzM2Wm0Bgr7AQKC6XOByYl2iFVos_916g';
+const SHEET_NAME = 'Social brands (pipeline)'; // nombre exacto de la hoja
+// ══════════════════════════════════════════════════════
+
+const SC = {
+  'Onboarded':'#10B981','Onboarding':'#F59E0B','Farming':'#06B6D4',
+  'En negociación':'#7C3AED','Presentacion VP':'#3B82F6','Hunting':'#6B7280',
+  'Cancelada':'#EF4444','Baja Onboarding':'#EF4444','Despriorizada':'#555','No Iniciaron':'#555'
+};
+
+// Estado global
+let ALL_BRANDS = [];
+let PLAN_DATA  = [];
+let lastLoaded = null;
+
+// ── CLOCK ──
+function updateClock(){
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yy = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mi = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('live-time').textContent = `en vivo · ${dd}/${mm}/${yy} ${hh}:${mi}`;
+}
+setInterval(updateClock, 30000);
+updateClock();
+
+// ── LOAD FROM SHEETS ──
+async function loadFromSheets() {
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('error-banner').classList.add('hidden');
+
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    // Google wraps the JSON in a callback
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+    const rows = json.table.rows;
+    const cols = json.table.cols.map(c => c.label);
+
+    ALL_BRANDS = rows.map(r => {
+      const get = (i) => r.c[i] ? (r.c[i].v !== null && r.c[i].v !== undefined ? String(r.c[i].v).trim() : '') : '';
+      // Detectar columnas por nombre (flexible ante cambios de orden)
+      const ci = (name) => cols.findIndex(c => c && c.toLowerCase().includes(name.toLowerCase()));
+
+      const iName   = ci('marca') !== -1 ? ci('marca') : 0;
+      const iStatus = ci('status') !== -1 ? ci('status') : 1;
+      const iPlan   = ci('plan') !== -1 ? ci('plan') : 2;
+      const iFollow = ci('follow') !== -1 ? ci('follow') : 3;
+      const iRango  = ci('rango') !== -1 ? ci('rango') : 4;
+      const iCat    = ci('categ') !== -1 ? ci('categ') : 5;
+      const iHunter = ci('hunter') !== -1 ? ci('hunter') : 6;
+      const iWave   = ci('wave') !== -1 ? ci('wave') : 7;
+      const iGenero = ci('gen') !== -1 ? ci('gen') : -1;
+      const iTpv    = ci('tpv') !== -1 ? ci('tpv') : -1;
+      const iMp     = ci('mp') !== -1 ? ci('mp') : -1;
+      const iCid    = ci('cust') !== -1 ? ci('cust') : -1;
+      const iTsi    = ci('tsi') !== -1 ? ci('tsi') : -1;
+      const iAsp    = ci('asp') !== -1 ? ci('asp') : -1;
+      const iGmv    = ci('gmv') !== -1 ? ci('gmv') : -1;
+
+      const name    = get(iName);
+      const status  = get(iStatus);
+      const plan    = get(iPlan);
+      const fRaw    = get(iFollow);
+      const wave    = get(iWave);
+
+      // Parse followers to number
+      let fNum = 0;
+      if (fRaw) {
+        const cleaned = fRaw.replace(/[KkMm,\s]/g, (m) => m.toLowerCase() === 'k' ? '000' : m.toLowerCase() === 'm' ? '000000' : '');
+        fNum = parseInt(cleaned.replace(/\D/g, '')) || 0;
+      }
+      const ff = formatFollowers(fNum || parseInt(fRaw) || 0, fRaw);
+
+      // Wave index for sorting
+      const wm = wave.match(/(\d+)/);
+      const wi = wm ? parseInt(wm[1]) : 99;
+
+      return {
+        n: name, s: status, p: plan,
+        f: fNum, ff: ff,
+        r: get(iRango), c: get(iCat),
+        h: get(iHunter), w: wave, wi,
+        genero: iGenero !== -1 ? get(iGenero) : '',
+        tpv:    iTpv    !== -1 ? get(iTpv)    : '',
+        mp:     iMp     !== -1 ? get(iMp)     : '',
+        cid:    iCid    !== -1 ? get(iCid)    : '',
+        tsi:    iTsi    !== -1 ? get(iTsi)    : '',
+        asp:    iAsp    !== -1 ? get(iAsp)    : '',
+        gmv:    iGmv    !== -1 ? get(iGmv)    : '',
+      };
+    }).filter(b => b.n); // filtrar filas vacías
+
+    // Separar datos para tabla Plan (Wave 10+, solo Onboarding/Onboarded)
+    PLAN_DATA = ALL_BRANDS.filter(b =>
+      (b.s === 'Onboarding' || b.s === 'Onboarded') && b.wi <= 15 && b.wi >= 0
+    );
+
+    lastLoaded = new Date();
+    document.getElementById('last-updated').textContent =
+      `actualizado ${String(lastLoaded.getHours()).padStart(2,'0')}:${String(lastLoaded.getMinutes()).padStart(2,'0')}`;
+
+    renderAll();
+
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+
+  } catch(e) {
+    console.error('Sheets error:', e);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('error-banner').classList.remove('hidden');
+    document.getElementById('error-msg').textContent =
+      `No se pudieron cargar los datos desde Google Sheets. Mostrando datos de respaldo. (${e.message})`;
+    // Fallback to embedded data
+    useFallbackData();
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function formatFollowers(n, raw) {
+  if (!n && raw) return raw;
+  if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+  if (n >= 1000) return Math.round(n/1000) + 'K';
+  return String(n);
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  renderKPIs();
+  renderFunnel();
+  renderCategoryDonut();
+  renderGenderDonut();
+  renderWaveBars();
+  renderHunters();
+  renderPlanExtra();
+  renderPlanKPIs();
+  renderPlanProgress();
+  renderWaveProgress();
+  renderMonthlyChart();
+  buildWaveChips();
+  pRender();
+  fB();
+}
+
+// ── KPIs ──
+function renderKPIs() {
+  const total      = ALL_BRANDS.length;
+  const onboarded  = ALL_BRANDS.filter(b => b.s === 'Onboarded').length;
+  const onboarding = ALL_BRANDS.filter(b => b.s === 'Onboarding').length;
+  const plan26     = ALL_BRANDS.filter(b => b.p === 'Plan').length;
+  document.getElementById('k-total').textContent     = total;
+  document.getElementById('k-onboarded').textContent  = onboarded;
+  document.getElementById('k-onboarding').textContent = onboarding;
+  document.getElementById('k-plan').textContent       = plan26;
+}
+
+// ── FUNNEL ──
+function renderFunnel() {
+  const stages = [
+    {label:'Hunting',          color:'#3B82F6'},
+    {label:'Presentacion VP',  color:'#7C3AED'},
+    {label:'En negociación',   color:'#10B981'},
+    {label:'Onboarding',       color:'#F59E0B'},
+    {label:'Onboarded',        color:'#10B981'},
+    {label:'Farming',          color:'#06B6D4'},
+    {label:'Cancelada',        color:'#EF4444'},
+    {label:'Baja Onboarding',  color:'#EF4444'},
+    {label:'Despriorizada',    color:'#555'},
+  ];
+  const counts = {};
+  ALL_BRANDS.forEach(b => { counts[b.s] = (counts[b.s]||0)+1; });
+  const max = Math.max(...Object.values(counts), 1);
+  const html = stages.map(st => {
+    const n = counts[st.label] || 0;
+    const pct = Math.round(n/max*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:11px;color:#F0EEF8;min-width:130px;flex-shrink:0">${st.label}</span>
+      <div style="flex:1;height:15px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${st.color}"></div>
+      </div>
+      <span style="font-size:10px;color:#9998A8;font-family:monospace;min-width:28px;text-align:right">${n}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('funnel-bars').innerHTML = html;
+}
+
+// ── DONUT ──
+function drawDonut(svgId, legendId, data) {
+  const colors = ['#4F46E5','#7C3AED','#10B981','#F59E0B','#EC4899','#3B82F6','#06B6D4','#EF4444','#6B7280'];
+  const total  = data.reduce((s,d) => s+d.v, 0) || 1;
+  const cx=39,cy=39,r=29,circ=2*Math.PI*r;
+  let offset=0;
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = data.map((d,i) => {
+    const dash = (d.v/total)*circ;
+    const el = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[i%colors.length]}" stroke-width="17"
+      stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"
+      stroke-dashoffset="${(-offset).toFixed(1)}"
+      transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset += dash;
+    return el;
+  }).join('');
+  document.getElementById(legendId).innerHTML = data.map((d,i) => {
+    const pct = Math.round(d.v/total*100);
+    return `<div class="li" style="margin-bottom:5px"><span class="lsq" style="background:${colors[i%colors.length]}"></span>${d.label} ${pct}%</div>`;
+  }).join('');
+}
+
+function renderCategoryDonut() {
+  const counts = {};
+  ALL_BRANDS.forEach(b => {
+    const cat = b.c ? b.c.split(/[,/]/)[0].trim() : 'Otros';
+    const key = cat || 'Otros';
+    counts[key] = (counts[key]||0)+1;
+  });
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const data = sorted.map(([label,v]) => ({label,v}));
+  drawDonut('cat-donut','cat-legend',data);
+}
+
+function renderGenderDonut() {
+  // Use genero field if available, otherwise estimate from category/name
+  const counts = {};
+  ALL_BRANDS.forEach(b => {
+    const g = b.genero || 'Sin dato';
+    counts[g] = (counts[g]||0)+1;
+  });
+  let data = Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([label,v]) => ({label,v}));
+  // If no genero column, use static reference data
+  if (data.length <= 1 || (data.length === 1 && data[0].label === 'Sin dato')) {
+    data = [
+      {label:'Mujer',    v:65},
+      {label:'Mujer+H',  v:20},
+      {label:'Hombre',   v:7},
+      {label:'Unisex',   v:7},
+      {label:'Otros',    v:1},
+    ];
+  }
+  drawDonut('gen-donut','gen-legend',data);
+}
+
+// ── WAVE BARS ──
+function renderWaveBars() {
+  // Count active brands (Onboarded + Onboarding + Farming) per wave
+  const waveCounts = {};
+  ALL_BRANDS.filter(b => ['Onboarded','Onboarding','Farming'].includes(b.s) && b.w).forEach(b => {
+    waveCounts[b.w] = (waveCounts[b.w]||0)+1;
+  });
+  const waves = Object.keys(waveCounts).sort((a,b) => {
+    const na = parseInt(a.match(/\d+/)?.[0]||0);
+    const nb = parseInt(b.match(/\d+/)?.[0]||0);
+    return na-nb;
+  }).slice(0,15);
+
+  const max = Math.max(...waves.map(w=>waveCounts[w]||0),1);
+  const barW=26, gap=3, h=110, padB=22, padT=8;
+  const totalW = waves.length*(barW+gap);
+  const svg = document.getElementById('wave-bars');
+  svg.setAttribute('width', Math.max(totalW, 435));
+  svg.setAttribute('viewBox', `0 0 ${Math.max(totalW, 435)} ${h}`);
+
+  const PLAN_WAVES = 9; // waves 10+ are plan
+  svg.innerHTML = waves.map((w,i) => {
+    const n = waveCounts[w]||0;
+    const bh = Math.max(4, ((n/max)*(h-padB-padT)));
+    const x = i*(barW+gap);
+    const y = h-padB-bh;
+    const wNum = parseInt(w.match(/\d+/)?.[0]||0);
+    const color = wNum >= 10 ? '#7C3AED' : '#4F46E5';
+    const label = 'W'+String(wNum).padStart(2,'0');
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${bh}" fill="${color}" rx="3"/>
+      <text x="${x+barW/2}" y="${h-padB+12}" text-anchor="middle" fill="#6B6A7A" font-size="8.5" font-family="monospace">${label}</text>
+      <text x="${x+barW/2}" y="${y-3}" text-anchor="middle" fill="#9998A8" font-size="8.5">${n}</text>`;
+  }).join('');
+}
+
+// ── HUNTERS ──
+function renderHunters() {
+  const counts = {};
+  ALL_BRANDS.forEach(b => { if(b.h) counts[b.h]=(counts[b.h]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const colors = ['#4F46E5','#7C3AED','#10B981','#F59E0B'];
+  document.getElementById('hunters-grid').innerHTML = sorted.map(([name,n],i) =>
+    `<div class="mc"><div class="ml">${name}</div><div class="mv" style="color:${colors[i]}">${n}</div></div>`
+  ).join('');
+}
+
+function renderPlanExtra() {
+  const plan  = ALL_BRANDS.filter(b=>b.p==='Plan').length;
+  const extra = ALL_BRANDS.filter(b=>b.p==='Extra').length;
+  document.getElementById('planextra-grid').innerHTML =
+    `<div class="mc"><div class="ml">Plan</div><div class="mv" style="color:#10B981">${plan}</div></div>
+     <div class="mc"><div class="ml">Extra</div><div class="mv" style="color:#F59E0B">${extra}</div></div>`;
+}
+
+// ── PLAN KPIs ──
+function renderPlanKPIs() {
+  const plan11plus = ALL_BRANDS.filter(b => b.wi >= 11 && b.wi <= 15 && b.p === 'Plan');
+  const done   = plan11plus.filter(b=>b.s==='Onboarded').length;
+  const proc   = plan11plus.filter(b=>b.s==='Onboarding').length;
+  const bajas  = ALL_BRANDS.filter(b=>b.s==='Baja Onboarding' && b.p==='Plan' && b.wi>=11).length;
+  const pend   = ALL_BRANDS.filter(b=>b.p==='Plan' && !b.w && (b.s==='Hunting'||b.s==='Presentacion VP'||b.s==='En negociación')).length;
+  document.getElementById('p-done').textContent  = done;
+  document.getElementById('p-proc').textContent  = proc;
+  document.getElementById('p-bajas').textContent = bajas;
+  document.getElementById('p-pend').textContent  = pend;
+}
+
+// ── PLAN PROGRESS ──
+function renderPlanProgress() {
+  const META = 80;
+  const plan11plus = ALL_BRANDS.filter(b => b.wi >= 11 && b.wi <= 15);
+  const done   = plan11plus.filter(b=>b.s==='Onboarded').length;
+  const proc   = plan11plus.filter(b=>b.s==='Onboarding').length;
+  const bajas  = plan11plus.filter(b=>b.s==='Baja Onboarding').length;
+  const active = done+proc;
+  const pct    = Math.round(active/META*100);
+  document.getElementById('p-active').textContent = active;
+  document.getElementById('p-pct').textContent    = pct+'%';
+  document.getElementById('p-bar').innerHTML =
+    `<div style="width:${(done/META*100).toFixed(1)}%;background:#10B981"></div>
+     <div style="width:${(proc/META*100).toFixed(1)}%;background:#F59E0B"></div>
+     <div style="width:${(bajas/META*100).toFixed(1)}%;background:#EF4444"></div>`;
+  document.getElementById('p-leg').innerHTML =
+    `<span class="li"><span class="lsq" style="background:#10B981"></span>Onboarded ${done}</span>
+     <span class="li"><span class="lsq" style="background:#F59E0B"></span>Onboarding ${proc}</span>
+     <span class="li"><span class="lsq" style="background:#EF4444"></span>Bajas ${bajas}</span>
+     <span class="li"><span class="lsq" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)"></span>Faltante ${Math.max(0,META-active-bajas)}</span>`;
+  // Monthly onboardings — use wave as proxy for month (Wave 11 ≈ Ene, etc.)
+  const waveToMonth = {11:'Enero',12:'Enero',13:'Febrero',14:'Marzo',15:'Marzo'};
+  const monthly = {};
+  ALL_BRANDS.filter(b=>b.s==='Onboarded'&&b.wi>=11).forEach(b=>{
+    const m = waveToMonth[b.wi]||'Otro';
+    monthly[m]=(monthly[m]||0)+1;
+  });
+  const months = ['Enero','Febrero','Marzo'];
+  document.getElementById('p-months').innerHTML = months.map(m=>
+    `<div><div style="font-size:9px;color:#6B6A7A;font-family:monospace;text-transform:uppercase;margin-bottom:3px">${m} 2026</div>
+     <div style="font-size:18px;font-weight:300">${monthly[m]||0}</div>
+     <div style="font-size:10px;color:#6B6A7A">onboardings</div></div>`
+  ).join('');
+}
+
+// ── WAVE PROGRESS (Plan tab) ──
+function renderWaveProgress() {
+  const waves = [11,12,13,14,15];
+  const html = waves.map(wi=>{
+    const brands = ALL_BRANDS.filter(b=>b.wi===wi);
+    const total  = brands.length || 1;
+    const done   = brands.filter(b=>b.s==='Onboarded').length;
+    const proc   = brands.filter(b=>b.s==='Onboarding').length;
+    const baja   = brands.filter(b=>b.s==='Baja Onboarding').length;
+    const noinit = brands.filter(b=>b.s==='No Iniciaron').length;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:11px;color:#F0EEF8;min-width:45px">W${wi}</span>
+      <div style="flex:1;height:15px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;display:flex">
+        <div style="width:${done/total*100}%;background:#10B981"></div>
+        <div style="width:${proc/total*100}%;background:#F59E0B"></div>
+        <div style="width:${baja/total*100}%;background:#EF4444"></div>
+        <div style="width:${noinit/total*100}%;background:#444"></div>
+      </div>
+      <span style="font-size:10px;color:#9998A8;font-family:monospace;min-width:20px;text-align:right">${brands.length}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('wave-progress').innerHTML = html;
+}
+
+// ── MONTHLY CHART ──
+function renderMonthlyChart() {
+  const META=80, MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const waveToIdx = {11:0,12:0,13:1,14:2,15:2};
+  const monthly = new Array(12).fill(0);
+  ALL_BRANDS.filter(b=>b.s==='Onboarded'&&b.wi>=11).forEach(b=>{
+    const idx = waveToIdx[b.wi] ?? 2;
+    monthly[idx]++;
+  });
+  const maxVal = Math.max(...monthly,1);
+  const W=432, H=88, padL=0, padB=14, barW=30, gap=6;
+  const step=(W)/(MONTHS.length);
+  let svg=``;
+  // Bars for months with data
+  monthly.forEach((n,i)=>{
+    if(n>0){
+      const x=i*step+step/2-barW/2;
+      const bh=Math.max(3,(n/maxVal)*(H-padB-8));
+      const y=H-padB-bh;
+      svg+=`<rect x="${x.toFixed(0)}" y="${y.toFixed(0)}" width="${barW}" height="${bh.toFixed(0)}" fill="#4F46E5" rx="3"/>`;
+      svg+=`<text x="${(i*step+step/2).toFixed(0)}" y="${(y-3).toFixed(0)}" text-anchor="middle" fill="#9998A8" font-size="8">${n}</text>`;
+    }
+    svg+=`<text x="${(i*step+step/2).toFixed(0)}" y="${H}" text-anchor="middle" fill="#6B6A7A" font-size="8.5" font-family="monospace">${MONTHS[i]}</text>`;
+  });
+  // Target line
+  for(let i=0;i<MONTHS.length-1;i++){
+    const x1=i*step+step/2, x2=(i+1)*step+step/2;
+    const y1=H-padB-((i+1)/12)*(H-padB-8)*0.9;
+    const y2=H-padB-((i+2)/12)*(H-padB-8)*0.9;
+    svg+=`<line x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" stroke="rgba(239,68,68,.5)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  }
+  document.getElementById('monthly-chart').innerHTML=svg;
+}
+
+// ── WAVE CHIPS (Plan tab) ──
+function buildWaveChips(){
+  const waves = [...new Set(PLAN_DATA.map(b=>b.w).filter(Boolean))].sort((a,b)=>{
+    return parseInt(a.match(/\d+/)?.[0]||0)-parseInt(b.match(/\d+/)?.[0]||0);
+  });
+  const container = document.getElementById('wave-chips-plan');
+  container.innerHTML = `<span class="wchip all on" onclick="toggleWave('all',this)">Todas</span>`;
+  waves.forEach(w=>{
+    const wNum = w.match(/\d+/)?.[0]||'?';
+    container.innerHTML += `<span class="wchip" onclick="toggleWave('${w}',this)">W${String(wNum).padStart(2,'0')}</span>`;
+  });
+}
+
+// ── TAB SWITCH ──
+function go(id,btn){
+  ['r','p','m'].forEach(t=>document.getElementById('t-'+t).classList.add('hidden'));
+  document.getElementById('t-'+id).classList.remove('hidden');
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  if(id==='m') fB();
+  if(id==='p') pRender();
+}
+
+// ── PLAN TABLE ──
+let selWaves=new Set(['all']);
+let psk='wi', psd=1, pcp_=1, pfil=[];
+
+function toggleWave(w,el){
+  if(w==='all'){
+    selWaves=new Set(['all']);
+    document.querySelectorAll('#wave-chips-plan .wchip').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');
+  } else {
+    selWaves.delete('all');
+    document.querySelector('#wave-chips-plan .wchip.all').classList.remove('on');
+    if(el.classList.contains('on')){
+      el.classList.remove('on');
+      selWaves.delete(w);
+      if(selWaves.size===0){selWaves.add('all');document.querySelector('#wave-chips-plan .wchip.all').classList.add('on');}
+    } else {
+      el.classList.add('on');
+      selWaves.add(w);
+    }
+  }
+  pcp_=1; pRender();
+}
+
+function pSort(k){
+  if(psk===k) psd*=-1; else{psk=k;psd=1;}
+  pcp_=1;
+  document.querySelectorAll('thead th[id^="ph"]').forEach(t=>{t.className='';});
+  const th=document.getElementById('ph-'+k);
+  if(th) th.className=psd===1?'sa':'sd';
+  pRender();
+}
+
+function pRender(){
+  const st=document.getElementById('pf-status').value;
+  const pl=document.getElementById('pf-plan').value;
+  const q=(document.getElementById('pf-q').value||'').toLowerCase();
+
+  pfil=PLAN_DATA.filter(b=>{
+    if(!selWaves.has('all')&&!selWaves.has(b.w)) return false;
+    if(st&&b.s!==st) return false;
+    if(pl&&b.p!==pl) return false;
+    if(q&&!b.n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const k=psk,d=psd;
+  pfil.sort((a,b)=>{
+    if(k==='f') return d*(b.f-a.f);
+    if(k==='wi') return d*(a.wi-b.wi);
+    if(k==='tpv'){
+      const av=parseFloat((a.tpv||'').replace(/[$.,]/g,''))||0;
+      const bv=parseFloat((b.tpv||'').replace(/[$.,]/g,''))||0;
+      return d*(bv-av);
+    }
+    return d*String(a[k]||'').localeCompare(String(b[k]||''),'es');
+  });
+
+  const tot=pfil.length,pgs=Math.max(1,Math.ceil(tot/40));
+  pcp_=Math.min(pcp_,pgs);
+  const s0=(pcp_-1)*40,sl=pfil.slice(s0,s0+40);
+
+  document.getElementById('plan-cnt').textContent=tot+' marcas';
+  document.getElementById('plan-badge').textContent=tot+' marcas';
+  document.getElementById('plan-pgi').textContent='Pág '+pcp_+'/'+pgs+' · '+tot;
+  document.getElementById('plan-prev').disabled=pcp_<=1;
+  document.getElementById('plan-next').disabled=pcp_>=pgs;
+
+  document.getElementById('plan-tbody').innerHTML=sl.map((b,i)=>{
+    const sc=SC[b.s]||'#6B7280';
+    const alt=(s0+i)%2?'background:rgba(255,255,255,.018)':'';
+    const sbadge=`<span style="font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;background:${sc}22;color:${sc};border:1px solid ${sc}44">${b.s}</span>`;
+    const pbadge=b.p==='Plan'
+      ?'<span style="font-size:9px;padding:1px 7px;border-radius:4px;font-weight:500;background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.25)">Plan</span>'
+      :b.p==='Extra'
+      ?'<span style="font-size:9px;padding:1px 7px;border-radius:4px;font-weight:500;background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.2)">Extra</span>'
+      :'<span style="color:rgba(255,255,255,.3);font-size:9px">—</span>';
+    const tpvHtml=b.tpv?`<span style="font-family:monospace;font-size:10px">${b.tpv}</span>`:'<span class="pnd">—</span>';
+    return `<tr style="${alt}">
+      <td class="tb">${b.n}</td><td>${sbadge}</td><td>${pbadge}</td>
+      <td class="tm">${b.w}</td>
+      <td class="tn">${b.ff||formatFollowers(b.f,'')}</td>
+      <td class="tm">${b.h||'—'}</td>
+      <td class="pnd">${b.cid||'sin ID'}</td>
+      <td class="pnd">${b.tsi||'pendiente'}</td>
+      <td class="pnd">${b.asp||'pendiente'}</td>
+      <td class="pnd">${b.gmv||'pendiente'}</td>
+      <td class="tn">${tpvHtml}</td>
+      <td class="tm">${b.mp||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function pCP(d){
+  const pgs=Math.max(1,Math.ceil(pfil.length/40));
+  pcp_=Math.max(1,Math.min(pgs,pcp_+d));
+  pRender();
+  document.querySelector('.stitle').scrollIntoView({behavior:'smooth'});
+}
+
+// ── MARCAS TABLE ──
+const PG=40; let bf=[],bp=1;
+function fB(){
+  const st=(document.getElementById('fs')||{}).value||'';
+  const pl=(document.getElementById('fp')||{}).value||'';
+  const hu=(document.getElementById('fh')||{}).value||'';
+  const q=((document.getElementById('fq')||{}).value||'').toLowerCase();
+  bf=ALL_BRANDS.filter(b=>{
+    if(st&&b.s!==st)return false;
+    if(pl&&b.p!==pl)return false;
+    if(hu&&b.h!==hu)return false;
+    if(q&&!b.n.toLowerCase().includes(q))return false;
+    return true;
+  });
+  bp=1; rB();
+}
+function rB(){
+  const tot=bf.length,pgs=Math.max(1,Math.ceil(tot/PG));bp=Math.min(bp,pgs);
+  const s0=(bp-1)*PG,sl=bf.slice(s0,s0+PG);
+  document.getElementById('bcnt').textContent=tot+' marcas';
+  document.getElementById('bpgi').textContent='Pág '+bp+'/'+pgs+' · '+tot;
+  document.getElementById('bprev').disabled=bp<=1;
+  document.getElementById('bnxt').disabled=bp>=pgs;
+  document.getElementById('btbody').innerHTML=sl.map((b,i)=>{
+    const sc=SC[b.s]||'#6B7280',alt=(s0+i)%2?'background:rgba(255,255,255,.018)':'';
+    const pc=b.p==='Plan'?'background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.25)':b.p==='Extra'?'background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.2)':'color:#6B7280';
+    return `<tr style="${alt}"><td class="tb">${b.n}</td>
+      <td><span style="font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;background:${sc}22;color:${sc};border:1px solid ${sc}44">${b.s}</span></td>
+      <td><span style="font-size:9px;padding:2px 7px;border-radius:4px;font-weight:500;${pc}">${b.p||'—'}</span></td>
+      <td class="tn">${b.ff||formatFollowers(b.f,'')}</td>
+      <td class="tm">${b.r||'—'}</td>
+      <td class="tm">${b.c||'—'}</td>
+      <td class="tm">${b.h||'—'}</td>
+      <td class="tm">${b.w||'—'}</td></tr>`;
+  }).join('');
+}
+function bcp(d){const pgs=Math.max(1,Math.ceil(bf.length/PG));bp=Math.max(1,Math.min(pgs,bp+d));rB();}
+
+// ── FALLBACK DATA (si Sheets no carga) ──
+function useFallbackData(){
+  // Datos embebidos como respaldo (mismos del archivo original)
+  ALL_BRANDS=[{"n":"Macu shop","s":"Hunting","p":"Plan","f":1200000,"ff":"1.2M","r":"+ 1M","c":"Calzado","h":"Delfi","w":"","wi":99},{"n":"Deliver","s":"En negociación","p":"Plan","f":1000000,"ff":"1.0M","r":"+ 1M","c":"Indumentaria","h":"","w":"","wi":99},{"n":"Rame Es Amor","s":"Onboarding","p":"Plan","f":801000,"ff":"801K","r":"600K +","c":"Indumentaria","h":"Guille","w":"Wave 11","wi":11},{"n":"0800 Don Rouch","s":"Onboarded","p":"Plan","f":534000,"ff":"534K","r":"Entre 300K y 600K","c":"Joyería","h":"","w":"Wave 11","wi":11,"tpv":"$44.603","mp":"Not In Meli"},{"n":"Giuliana","s":"Onboarding","p":"Plan","f":601000,"ff":"601K","r":"600K +","c":"Calzados","h":"","w":"Wave 15","wi":15},{"n":"Vieja Scul","s":"Onboarding","p":"Plan","f":371000,"ff":"371K","r":"Entre 300K y 600K","c":"Indumentaria","h":"","w":"Wave 12","wi":12,"tpv":"$31.128","mp":"Not In Meli"},{"n":"My Fair","s":"Onboarding","p":"Plan","f":361000,"ff":"361K","r":"Entre 300K y 600K","c":"Trajes de baño","h":"Guille","w":"Wave 15","wi":15},{"n":"MARIA C","s":"Onboarding","p":"Plan","f":355000,"ff":"355K","r":"Entre 300K y 600K","c":"Indumentaria","h":"Guille","w":"Wave 13","wi":13},{"n":"Iman","s":"Onboarding","p":"Plan","f":266000,"ff":"266K","r":"Entre 200K y 300K","c":"Indumentaria","h":"Delfi","w":"Wave 11","wi":11},{"n":"Karamelho","s":"Onboarding","p":"Plan","f":241000,"ff":"241K","r":"Entre 200K y 300K","c":"Calzado y accesorios","h":"","w":"Wave 12","wi":12},{"n":"Chic Denim","s":"Onboarding","p":"Extra","f":297000,"ff":"297K","r":"Entre 200K y 300K","c":"Indumentaria","h":"","w":"Wave 15","wi":15,"tpv":"$34.828","mp":"Not In Meli"},{"n":"LaLoc","s":"Onboarding","p":"Plan","f":164000,"ff":"164K","r":"Entre 100K y 200K","c":"Calzado","h":"","w":"Wave 11","wi":11,"tpv":"$13.993","mp":"Not In Meli"},{"n":"Mae Intimates","s":"Onboarding","p":"Plan","f":173000,"ff":"173K","r":"Entre 100K y 200K","c":"Lenceria","h":"","w":"Wave 12","wi":12,"tpv":"$33.442","mp":"Not In Meli"},{"n":"Touche sport","s":"Onboarding","p":"","f":613000,"ff":"613K","r":"600K +","c":"Indumentaria deportiva","h":"","w":"Wave 14","wi":14},{"n":"Fuark","s":"Onboarding","p":"Extra","f":170000,"ff":"170K","r":"Entre 100K y 200K","c":"Indumentaria deportiva","h":"","w":"Wave 14","wi":14,"tpv":"$44.228","mp":"Fuera Pipeline"},{"n":"Amara","s":"Onboarding","p":"Plan","f":188000,"ff":"188K","r":"Entre 100K y 200K","c":"Indumentaria","h":"","w":"Wave 13","wi":13},{"n":"Boston Hype","s":"Onboarding","p":"Plan","f":118000,"ff":"118K","r":"Entre 100K y 200K","c":"Indumentaria","h":"","w":"Wave 13","wi":13,"tpv":"$16.071","mp":"Not In Meli"},{"n":"Animal","s":"Onboarding","p":"Plan","f":83000,"ff":"83K","r":"Entre 50K y 100K","c":"Indumentaria","h":"","w":"Wave 15","wi":15},{"n":"Koha","s":"Onboarding","p":"Plan","f":44800,"ff":"45K","r":"Entre 30K y 50K","c":"Indumentaria","h":"","w":"Wave 11","wi":11,"tpv":"$20.611","mp":"Not In Meli"},{"n":"Belona","s":"Onboarding","p":"Plan","f":79000,"ff":"79K","r":"Entre 50K y 100K","c":"Carteras","h":"","w":"Wave 13","wi":13},{"n":"Garza Lobos","s":"Onboarding","p":"Plan","f":53700,"ff":"54K","r":"Entre 50K y 100K","c":"Indumentaria","h":"","w":"Wave 11","wi":11},{"n":"Bellaco","s":"Onboarding","p":"Plan","f":73100,"ff":"73K","r":"Entre 50K y 100K","c":"Indumentaria","h":"","w":"Wave 12","wi":12},{"n":"Le Solee","s":"Onboarding","p":"Plan","f":50300,"ff":"50K","r":"Entre 50K y 100K","c":"Indumentaria","h":"","w":"Wave 12","wi":12},{"n":"Lara Casa","s":"Onboarded","p":"","f":171000,"ff":"171K","r":"Entre 100K y 200K","c":"Calzado","h":"Guille","w":"Wave 01","wi":1},{"n":"NXBO","s":"Onboarded","p":"","f":122000,"ff":"122K","r":"Entre 100K y 200K","c":"Indumentaria","h":"","w":"Wave 03","wi":3},{"n":"Trown","s":"Onboarded","p":"","f":101000,"ff":"101K","r":"Entre 100K y 200K","c":"Indumentaria","h":"","w":"Wave 02","wi":2},{"n":"Ranga","s":"Onboarded","p":"","f":100000,"ff":"100K","r":"Entre 100K y 200K","c":"Indumentaria","h":"","w":"Wave 04","wi":4},{"n":"Hardem","s":"Onboarded","p":"","f":57000,"ff":"57K","r":"Entre 50K y 100K","c":"Anteojos","h":"Guille","w":"Wave 0","wi":0},{"n":"THE LUXE STORE","s":"Onboarded","p":"","f":330000,"ff":"330K","r":"Entre 300K y 600K","c":"Vestidos de fiesta","h":"Guille","w":"Wave 07","wi":7},{"n":"Hunting brand A","s":"Hunting","p":"Plan","f":200000,"ff":"200K","r":"Entre 200K y 300K","c":"Indumentaria","h":"Delfi","w":"","wi":99},{"n":"Hunting brand B","s":"Hunting","p":"Extra","f":150000,"ff":"150K","r":"Entre 100K y 200K","c":"Calzado","h":"Guille","w":"","wi":99}];
+  PLAN_DATA = ALL_BRANDS.filter(b=>(b.s==='Onboarding'||b.s==='Onboarded')&&b.wi<=15);
+  renderAll();
+}
+
+// ── INIT ──
+loadFromSheets();
+</script>
+</body>
+</html>
