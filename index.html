@@ -280,8 +280,7 @@ tr:hover td{background:rgba(79,70,229,.06)!important}
 // ══════════════════════════════════════════════════════
 //  CONFIGURACIÓN — EDITÁ SOLO ESTA SECCIÓN
 // ══════════════════════════════════════════════════════
-const SHEET_ID   = '1_nkDHrav1oSzM2Wm0Bgr7AQKC6XOByYl2iFVos_916g';
-const SHEET_NAME = 'Social brands (pipeline)'; // nombre exacto de la hoja
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycbwYR1OuFOIoeOw5lumj5w_UYLmuOIa0sYcrPso_08onPSAeoCN0V8HaKvVX63aVFdM/exec';
 // ══════════════════════════════════════════════════════
 
 const SC = {
@@ -318,68 +317,61 @@ async function loadFromSheets() {
   btn.disabled = true;
 
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-    const res  = await fetch(url);
+    const res  = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    // Google wraps the JSON in a callback
-    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-    const rows = json.table.rows;
-    const cols = json.table.cols.map(c => c.label);
+    const rows = await res.json();
+
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error('Sin datos');
+
+    // Detectar nombres de columnas de forma flexible
+    const firstRow = rows[0];
+    const keys = Object.keys(firstRow);
+    const ci = (name) => keys.find(k => k && k.toLowerCase().includes(name.toLowerCase())) || null;
+
+    const kName   = ci('marca')  || ci('nombre') || ci('brand') || keys[0];
+    const kStatus = ci('status') || ci('estado')  || keys[1];
+    const kPlan   = ci('plan')   || keys[2];
+    const kFollow = ci('follow') || ci('segui')   || keys[3];
+    const kRango  = ci('rango')  || null;
+    const kCat    = ci('categ')  || ci('categoria')|| null;
+    const kHunter = ci('hunter') || null;
+    const kWave   = ci('wave')   || null;
+    const kGenero = ci('gen')    || null;
+    const kTpv    = ci('tpv')    || null;
+    const kMp     = ci('mp')     || null;
+    const kCid    = ci('cust')   || ci('id')      || null;
+    const kTsi    = ci('tsi')    || null;
+    const kAsp    = ci('asp')    || null;
+    const kGmv    = ci('gmv')    || null;
 
     ALL_BRANDS = rows.map(r => {
-      const get = (i) => r.c[i] ? (r.c[i].v !== null && r.c[i].v !== undefined ? String(r.c[i].v).trim() : '') : '';
-      // Detectar columnas por nombre (flexible ante cambios de orden)
-      const ci = (name) => cols.findIndex(c => c && c.toLowerCase().includes(name.toLowerCase()));
-
-      const iName   = ci('marca') !== -1 ? ci('marca') : 0;
-      const iStatus = ci('status') !== -1 ? ci('status') : 1;
-      const iPlan   = ci('plan') !== -1 ? ci('plan') : 2;
-      const iFollow = ci('follow') !== -1 ? ci('follow') : 3;
-      const iRango  = ci('rango') !== -1 ? ci('rango') : 4;
-      const iCat    = ci('categ') !== -1 ? ci('categ') : 5;
-      const iHunter = ci('hunter') !== -1 ? ci('hunter') : 6;
-      const iWave   = ci('wave') !== -1 ? ci('wave') : 7;
-      const iGenero = ci('gen') !== -1 ? ci('gen') : -1;
-      const iTpv    = ci('tpv') !== -1 ? ci('tpv') : -1;
-      const iMp     = ci('mp') !== -1 ? ci('mp') : -1;
-      const iCid    = ci('cust') !== -1 ? ci('cust') : -1;
-      const iTsi    = ci('tsi') !== -1 ? ci('tsi') : -1;
-      const iAsp    = ci('asp') !== -1 ? ci('asp') : -1;
-      const iGmv    = ci('gmv') !== -1 ? ci('gmv') : -1;
-
-      const name    = get(iName);
-      const status  = get(iStatus);
-      const plan    = get(iPlan);
-      const fRaw    = get(iFollow);
-      const wave    = get(iWave);
+      const g = (k) => k && r[k] !== undefined && r[k] !== null ? String(r[k]).trim() : '';
+      const name   = g(kName);
+      const status = g(kStatus);
+      const wave   = g(kWave);
+      const fRaw   = g(kFollow);
 
       // Parse followers to number
       let fNum = 0;
       if (fRaw) {
-        const cleaned = fRaw.replace(/[KkMm,\s]/g, (m) => m.toLowerCase() === 'k' ? '000' : m.toLowerCase() === 'm' ? '000000' : '');
-        fNum = parseInt(cleaned.replace(/\D/g, '')) || 0;
+        const up = fRaw.toUpperCase();
+        if (up.includes('M')) fNum = parseFloat(fRaw) * 1000000;
+        else if (up.includes('K')) fNum = parseFloat(fRaw) * 1000;
+        else fNum = parseInt(fRaw.replace(/\D/g,'')) || 0;
       }
-      const ff = formatFollowers(fNum || parseInt(fRaw) || 0, fRaw);
-
-      // Wave index for sorting
+      const ff = formatFollowers(fNum, fRaw);
       const wm = wave.match(/(\d+)/);
       const wi = wm ? parseInt(wm[1]) : 99;
 
       return {
-        n: name, s: status, p: plan,
-        f: fNum, ff: ff,
-        r: get(iRango), c: get(iCat),
-        h: get(iHunter), w: wave, wi,
-        genero: iGenero !== -1 ? get(iGenero) : '',
-        tpv:    iTpv    !== -1 ? get(iTpv)    : '',
-        mp:     iMp     !== -1 ? get(iMp)     : '',
-        cid:    iCid    !== -1 ? get(iCid)    : '',
-        tsi:    iTsi    !== -1 ? get(iTsi)    : '',
-        asp:    iAsp    !== -1 ? get(iAsp)    : '',
-        gmv:    iGmv    !== -1 ? get(iGmv)    : '',
+        n: name, s: status, p: g(kPlan),
+        f: fNum, ff,
+        r: g(kRango), c: g(kCat),
+        h: g(kHunter), w: wave, wi,
+        genero: g(kGenero), tpv: g(kTpv), mp: g(kMp),
+        cid: g(kCid), tsi: g(kTsi), asp: g(kAsp), gmv: g(kGmv),
       };
-    }).filter(b => b.n); // filtrar filas vacías
+    }).filter(b => b.n);
 
     // Separar datos para tabla Plan (Wave 10+, solo Onboarding/Onboarded)
     PLAN_DATA = ALL_BRANDS.filter(b =>
